@@ -67,7 +67,8 @@ fun main() {
 
 enum class Position {
     Start,
-    Q1, Q2, Q3, GoodFinish,
+    Q1, Q2, Q3,
+    GoodFinish,
     BadFinish,
     Finish
 }
