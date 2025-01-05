@@ -1,6 +1,24 @@
 fun main() {
     val states = HashMap<Position, State>()
 
+    gameSet(states)
+
+    var position = Position.Start
+
+    do {
+        val state = states[position]!!
+        val nextState = state.invoke()
+
+        position =
+            if (nextState != null) nextState
+            else Position.entries[position.ordinal + 1]
+
+    } while (position != Position.Finish)
+
+    states[Position.Finish]!!.invoke()
+}
+
+fun gameSet(states: HashMap<Position, State>) {
     states[Position.Start] = State(
         message = "Начнём экзамен.",
         nextPosition = Position.Q1,
@@ -49,20 +67,6 @@ fun main() {
     states[Position.Finish] = State(
         message = "The END",
     )
-
-    var position = Position.Start
-
-    do {
-        val state = states[position]!!
-        val nextState = state.invoke()
-
-        position =
-            if (nextState != null) nextState
-            else Position.entries[position.ordinal + 1]
-
-    } while (position != Position.Finish)
-
-    states[Position.Finish]!!.invoke()
 }
 
 enum class Position {
