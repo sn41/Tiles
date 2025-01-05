@@ -1,68 +1,71 @@
 fun main() {
-    val states = HashMap<Article, State>()
+    val states = HashMap<Position, State>()
 
-    states[Article.Start] = State(
+    states[Position.Start] = State(
         message = "Начнём экзамен.",
-        nextArticle = Article.Q1,
+        nextPosition = Position.Q1,
     )
 
-    states[Article.Q1] = State(
+    states[Position.Q1] = State(
         message = "Первый вопрос",
         question = "Какой предмет сдаёте?",
-//        options = "Программирование, Не знаю",
         options = "1. Программирование, 2.Не знаю",
-//        trueAnswer = "Программирование",
         trueAnswer = "1",
-        nextArticle = Article.Q2,
-        falseJmp = Article.BadFinish
+        nextPosition = Position.Q2,
+        falseJmp = Position.BadFinish
     )
 
-    states[Article.Q2] = State(
+    states[Position.Q2] = State(
         message = "Второй вопрос",
         question = "Как меня зовут?",
         options = "1. Иван Иваныч, 2. Не знаю",
-//        options = "Иван Иваныч, Не знаю",
-//        trueAnswer = "Иван Иваныч",
         trueAnswer = "1",
-        nextArticle = Article.Q3,
-        falseJmp = Article.BadFinish
+        nextPosition = Position.Q3,
+        falseJmp = Position.BadFinish
     )
 
 
-    states[Article.Q3] = State(
+    states[Position.Q3] = State(
         message = "Третий вопрос",
         question = "Какой язык изучали?",
-//        options = "Java, Не знаю",
         options = "1. Java, 2. Не знаю",
+//        options = "Java, Не знаю",
 //        trueAnswer = "Java",
         trueAnswer = "1",
-        nextArticle = Article.GoodFinish,
-        falseJmp = Article.BadFinish
+        nextPosition = Position.GoodFinish,
+        falseJmp = Position.BadFinish
     )
 
-    states[Article.GoodFinish] = State(
+    states[Position.GoodFinish] = State(
         message = "Ставлю отлично",
-        nextArticle = Article.Finish
+        nextPosition = Position.Finish
     )
 
-    states[Article.BadFinish] = State(
+    states[Position.BadFinish] = State(
         message = "Переэкзаменовка!",
-        nextArticle = Article.Finish
+        nextPosition = Position.Finish
     )
 
-
-    states[Article.Finish] = State(
+    states[Position.Finish] = State(
         message = "The END",
     )
 
-    var state = Article.Start
+    var position = Position.Start
 
     do {
-        state =  states[state]!!.answer()
-    } while (state != Article.Finish)
+        val state = states[position]!!
+        val nextState = state.invoke()
+
+        position =
+            if (nextState != null) nextState
+            else Position.entries[position.ordinal + 1]
+
+    } while (position != Position.Finish)
+
+    states[Position.Finish]!!.invoke()
 }
 
-enum class Article {
+enum class Position {
     Start,
     Q1, Q2, Q3, GoodFinish,
     BadFinish,
@@ -74,19 +77,21 @@ class State(
     val question: String = "",
     val options: String = "",
     val trueAnswer: String = "",
-    val nextArticle: Article = Article.Finish,
-    val falseJmp: Article = nextArticle,
+    val nextPosition: Position? = null,
+    val falseJmp: Position? = Position.BadFinish,
 ) {
-    fun answer(): Article {
-        println("$message")
-        println(question)
-        println(options)
+    fun invoke(): Position? {
+        println(message)
+
+        if (question.isNotBlank()) println(question)
+
+        if (options.isNotBlank()) println(options)
 
         if (question.isNotBlank()) {
             val answer = readLine()?.lowercase()?.trim()
-            if (answer.contentEquals(trueAnswer)) return nextArticle
+            if (answer.contentEquals(trueAnswer)) return nextPosition
             else return falseJmp
-        } else return nextArticle
+        } else return nextPosition
     }
 
 }
